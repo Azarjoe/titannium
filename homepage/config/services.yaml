@@ -10,3 +10,7 @@
     - NAS:
         href: https://nas.titannium.fr
         icon: files
+
+    - Portainer:
+        href: https://portainer.titannium.fr
+        icon: portainer
