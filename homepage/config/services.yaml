@@ -14,3 +14,20 @@
     - Portainer:
         href: https://portainer.titannium.fr
         icon: portainer
+
+- Streaming:
+    - Disney+:
+        href: https://disneyplus.com
+        icon: disney-plus
+
+    - Prime Video:
+        href: https://primevideo.com
+        icon: https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Amazon_Prime_Video_logo_%282024%29.svg/960px-Amazon_Prime_Video_logo_%282024%29.svg.png
+
+    - Max:
+        href: https://max.com
+        icon: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR4OX1IRchlKZFj_MD-8Qw9esdgUxlaNkZTA&s
+
+    - Ikromi:
+        href: https://ikromi.com
+        icon: https://www.google.com/s2/favicons?sz=128&domain=ikromi.com
