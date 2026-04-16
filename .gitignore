@@ -1,0 +1,8 @@
+# volumes docker
+*/data/
+*/letsencrypt/
+
+# fichiers sensibles
+*.env
+*.log
+

@@ -1,0 +1,12 @@
+- Services:
+    - Home:
+        href: https://home.titannium.fr
+        icon: homepage
+
+    - Nginx Proxy Manager:
+        href: https://npm.titannium.fr
+        icon: npm
+
+    - NAS:
+        href: https://nas.titannium.fr
+        icon: files

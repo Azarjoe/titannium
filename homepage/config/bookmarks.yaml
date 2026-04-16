@@ -1,0 +1,22 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/bookmarks
+
+- Developer:
+    - Github:
+        - href: https://github.com/Azarjoe
+          icon: github
+
+    - Linkedin:
+        - href: https://linkedin.com/in/julien-sage-6130391bb/
+          icon: linkedin
+
+- Social:
+    - Spotify:
+        - href: https://open.spotify.com/user/murphy.julien
+          icon: spotify
+
+- Entertainment:
+    - YouTube:
+        - href: https://youtube.com/@supercalmeproduction7846
+          icon: youtube

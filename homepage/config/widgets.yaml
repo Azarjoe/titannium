@@ -1,0 +1,42 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/info-widgets/
+
+- resources:
+    cpu: true
+    memory: true
+    disk: /
+
+- search:
+    provider: duckduckgo
+    target: _blank
+
+- datetime:
+    text_size: xl
+    format:
+      timeStyle: short
+      hourCycle: h23
+    locale: fr-FR
+    timezones:
+      - Europe/Paris
+
+- openmeteo:
+    label: Paris 🇫🇷
+    latitude: 48.8566
+    longitude: 2.3522
+    timezone: Europe/Paris
+    units: metric
+
+- openmeteo:
+    label: Berlin 🇩🇪
+    latitude: 52.52
+    longitude: 13.405
+    timezone: Europe/Berlin
+    units: metric
+
+- openmeteo:
+    label: Ajaccio 🌴
+    latitude: 41.9192
+    longitude: 8.7386
+    timezone: Europe/Paris
+    units: metric
