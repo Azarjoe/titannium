@@ -6,3 +6,7 @@
 *.env
 *.log
 
+
+pwpush/*.db
+pwpush/*.db-shm
+pwpush/*.db-wal
