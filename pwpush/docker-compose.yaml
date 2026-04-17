@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  pwpush:
+    image: pglombardo/pwpush:latest
+    container_name: pwpush
+    ports:
+      - "5100:5100"
+    volumes:
+      - /srv/docker/pwpush:/opt/pwpush/db
+    environment:
+      - DATABASE_URL=sqlite3:/opt/pwpush/db/pwpush.db
+    restart: unless-stopped
