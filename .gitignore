@@ -18,3 +18,11 @@ portainer/
 
 # MeTube downloads
 metube/downloads/
+
+uptime-kuma/
+
+npm/data/
+
+
+crowdsec/config/*
+!crowdsec/config/acquis.yaml

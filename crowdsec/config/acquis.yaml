@@ -1,0 +1,17 @@
+filenames:
+  - /var/log/auth.log
+labels:
+  type: syslog
+
+---
+filenames:
+  - /var/lib/docker/containers/*/*-json.log
+labels:
+  type: docker
+
+---
+filenames:
+  - /logs/npm/*_access.log
+labels:
+  type: nginx
+  program: nginx

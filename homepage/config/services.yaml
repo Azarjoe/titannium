@@ -1,19 +1,7 @@
-- Services:
-    - Home:
-        href: https://home.titannium.fr
-        icon: homepage
-
-    - Nginx Proxy Manager:
-        href: https://npm.titannium.fr
-        icon: npm
-
+- Apps:
     - NAS:
         href: https://nas.titannium.fr
         icon: files
-
-    - Portainer:
-        href: https://portainer.titannium.fr
-        icon: portainer
 
     - Secrets Pusher:
         href: https://secret.titannium.fr
@@ -26,6 +14,8 @@
     - Convertisseur YT:
         href: https://ytconvert.titannium.fr
         icon: https://media.sys.truenas.net/apps/metube/icons/icon.svg
+
+
 - Streaming:
     - Disney+:
         href: https://disneyplus.com
@@ -42,3 +32,23 @@
     - Ikromi:
         href: https://ikromi.com
         icon: https://www.google.com/s2/favicons?sz=128&domain=ikromi.com
+
+
+- Infrastructure & Monitoring:
+    - Nginx Proxy Manager:
+        href: https://npm.titannium.fr
+        icon: npm
+
+    - Portainer:
+        href: https://portainer.titannium.fr
+        icon: portainer
+
+    - CrowdSec:
+        href: https://app.crowdsec.net
+        icon: https://upload.wikimedia.org/wikipedia/commons/b/b3/CS-logo.webp
+
+    - Kuma:
+        href: https://kuma.titannium.fr
+        icon: https://raw.githubusercontent.com/louislam/uptime-kuma/master/public/icon.svg
+
+

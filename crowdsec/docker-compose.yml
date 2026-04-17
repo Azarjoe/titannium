@@ -1,0 +1,19 @@
+services:
+  crowdsec:
+    image: crowdsecurity/crowdsec:latest
+    container_name: crowdsec
+    restart: unless-stopped
+    volumes:
+      - ./config:/etc/crowdsec
+      - ./data:/var/lib/crowdsec/data
+      - /var/log:/var/log:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /srv/docker/npm/data/logs:/logs/npm:ro
+    environment:
+      - COLLECTIONS=crowdsecurity/nginx crowdsecurity/sshd
+    networks:
+      - npm_default
+
+networks:
+  npm_default:
+    external: true
