@@ -1,0 +1,82 @@
+version: "3"
+
+services:
+
+  npm:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: npm
+    ports:
+      - "80:80"
+      - "81:81"
+      - "443:443"
+    volumes:
+      - ./npm/data:/data
+      - ./npm/letsencrypt:/etc/letsencrypt
+    restart: unless-stopped
+
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./homepage/config:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+    environment:
+      - HOMEPAGE_ALLOWED_HOSTS=home.titannium.fr
+
+  pwpush:
+    image: pglombardo/pwpush:latest
+    container_name: pwpush
+    ports:
+      - "5100:5100"
+    volumes:
+      - ./pwpush:/opt/pwpush/db
+    environment:
+      - DATABASE_URL=sqlite3:/opt/pwpush/db/pwpush.db
+    restart: unless-stopped
+
+  maintenance:
+    image: nginx:alpine
+    container_name: maintenance
+    ports:
+      - "8080:80"
+    volumes:
+      - ./maintenance:/usr/share/nginx/html:ro
+    restart: unless-stopped
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    ports:
+      - "9000:9000"
+      - "9443:9443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./portainer:/data
+    restart: unless-stopped
+
+  mealie:
+    image: ghcr.io/mealie-recipes/mealie:latest
+    container_name: mealie
+    ports:
+      - "9925:9000"
+    environment:
+      - ALLOW_SIGNUP=true
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+      - BASE_URL=https://recettes.titannium.fr
+    volumes:
+      - ./mealie/data:/app/data
+    restart: unless-stopped
+
+  metube:
+    image: ghcr.io/alexta69/metube:latest
+    container_name: metube
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./metube/downloads:/downloads
+    restart: unless-stopped

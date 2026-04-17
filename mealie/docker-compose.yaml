@@ -1,0 +1,15 @@
+services:
+  mealie:
+    image: ghcr.io/mealie-recipes/mealie:latest
+    container_name: mealie
+    ports:
+      - "9925:9000"
+    environment:
+      - ALLOW_SIGNUP=true
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+      - BASE_URL=https://recettes.titannium.fr
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped

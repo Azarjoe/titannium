@@ -19,6 +19,13 @@
         href: https://secret.titannium.fr
         icon: https://www.google.com/s2/favicons?sz=128&domain=eu.pwpush.com
 
+    - Recettes:
+        href: https://recettes.titannium.fr
+        icon: https://cdn-icons-png.flaticon.com/512/1830/1830839.png
+
+    - Convertisseur YT:
+        href: https://ytconvert.titannium.fr
+        icon: https://media.sys.truenas.net/apps/metube/icons/icon.svg
 - Streaming:
     - Disney+:
         href: https://disneyplus.com

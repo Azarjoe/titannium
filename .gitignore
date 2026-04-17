@@ -10,3 +10,11 @@
 pwpush/*.db
 pwpush/*.db-shm
 pwpush/*.db-wal
+
+
+# Portainer
+portainer/
+
+
+# MeTube downloads
+metube/downloads/
