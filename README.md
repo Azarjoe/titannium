@@ -136,3 +136,46 @@ The pipeline is defined in `.github/workflows/validate.yml`.
 - [ ] Grafana + Prometheus observability stack
 - [ ] Automated backups (Restic)
 - [ ] CD pipeline — automatic deployment on push
+
+
+## Technical decisions
+
+### Why Docker?
+
+All services run in containers rather than being installed directly on the host system for four reasons:
+
+- **Isolation** — each service runs in its own environment. A crash or compromise in one container does not affect the others.
+- **Portability** — the entire infrastructure is described in a `docker-compose.yaml` file. Rebuilding on a new machine is a single command.
+- **Reproducibility** — the environment is frozen and versioned. No dependency drift, no "works on my machine" issues.
+- **Simplified updates** — `docker compose pull && docker compose up -d` updates any service without touching the host system. Rolling back is as simple as pinning the previous image version.
+
+---
+
+### Why Tailscale over exposing SSH directly?
+
+Exposing an SSH port on the internet means constant brute force attempts and exposure to zero-day vulnerabilities in the SSH daemon.
+
+Tailscale creates an encrypted WireGuard tunnel between authorized devices. The SSH port is never exposed publicly — it simply does not exist from the internet's perspective. This reduces the attack surface to zero for remote access.
+
+> A closed port cannot be attacked.
+
+---
+
+### Why CrowdSec over Fail2ban?
+
+Fail2ban is reactive and local — it only learns from your own logs, after you have already been attacked.
+
+CrowdSec brings two things Fail2ban cannot:
+
+- **Community threat intelligence** — malicious IPs reported by thousands of servers worldwide are automatically blocked on your server, before they ever reach you.
+- **Decoupled architecture** — the detection agent and the bouncer are separate components. The agent detects threats regardless of how they will be blocked. Adding a new bouncer (iptables, Nginx, Cloudflare) requires no changes to the detection layer. This separation of concerns mirrors patterns used in production security infrastructure.
+
+---
+
+### Why Nginx Proxy Manager over raw Nginx?
+
+Configuring Nginx manually for multiple subdomains with SSL means writing server blocks by hand, installing Certbot, managing certificate renewal, and repeating the process for every new service.
+
+Nginx Proxy Manager handles SSL certificate generation and renewal (Let's Encrypt), HTTP to HTTPS redirection, and proxy host configuration through a UI — reducing operational overhead significantly.
+
+That said, NPM abstracts too much for complex production environments. In an enterprise context, direct Nginx or Traefik configuration would give finer control over headers, routing rules and rate limiting. NPM is the right tool for this scale.
