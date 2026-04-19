@@ -51,4 +51,6 @@
         href: https://kuma.titannium.fr
         icon: https://raw.githubusercontent.com/louislam/uptime-kuma/master/public/icon.svg
 
-
+    - Grafana:
+        href: https://grafana.titannium.fr
+        icon: grafana
