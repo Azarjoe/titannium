@@ -47,11 +47,14 @@ All services are orchestrated via Docker Compose and exposed through Nginx Proxy
 | Tailscale  | Zero-trust private network for remote access  | Internal only                |
 | NPM        | Access lists, HTTPS enforcement on all routes | https://npm.titannium.fr     |
 
-### Monitoring
+### Monitoring & Observability
 
-| Service      | Role                                        | URL                         |
-|--------------|---------------------------------------------|-----------------------------|
-| Uptime Kuma  | Service monitoring, alerting via SMTP Gmail | https://kuma.titannium.fr   |
+| Service        | Role                                               | URL                          |
+|----------------|----------------------------------------------------|------------------------------|
+| Uptime Kuma    | Service availability monitoring, alerting via SMTP | https://kuma.titannium.fr    |
+| Grafana        | Metrics visualization and dashboards               | https://grafana.titannium.fr |
+| Prometheus     | Metrics collection and storage (15 days retention) | Internal only                |
+| Node Exporter  | System metrics exposure (CPU, RAM, disk, network)  | Internal only                |
 
 ### Tools & Services
 
@@ -81,6 +84,9 @@ All services are orchestrated via Docker Compose and exposed through Nginx Proxy
 │       ├── services.yaml       # Services displayed on dashboard
 │       ├── widgets.yaml        # Widgets (CPU, RAM, weather)
 │       └── bookmarks.yaml      # External shortcuts
+├── monitoring/
+│   ├── docker-compose.yml      # Grafana, Prometheus, Node Exporter
+│   └── prometheus.yml          # Scrape config
 ├── npm/
 │   └── data/
 │       ├── nginx/              # Proxy host configs
@@ -133,10 +139,11 @@ The pipeline is defined in `.github/workflows/validate.yml`.
 
 - [ ] NAS setup (pending hardware)
 - [ ] Nextcloud deployment
-- [ ] Grafana + Prometheus observability stack
+- [x] Grafana + Prometheus observability stack
 - [ ] Automated backups (Restic)
 - [ ] CD pipeline — automatic deployment on push
 
+---
 
 ## Technical decisions
 
@@ -179,3 +186,15 @@ Configuring Nginx manually for multiple subdomains with SSL means writing server
 Nginx Proxy Manager handles SSL certificate generation and renewal (Let's Encrypt), HTTP to HTTPS redirection, and proxy host configuration through a UI — reducing operational overhead significantly.
 
 That said, NPM abstracts too much for complex production environments. In an enterprise context, direct Nginx or Traefik configuration would give finer control over headers, routing rules and rate limiting. NPM is the right tool for this scale.
+
+---
+
+### Why Grafana + Prometheus over Uptime Kuma alone?
+
+Uptime Kuma answers one question: is the service up or down?
+
+Grafana + Prometheus answer a different set of questions: how much CPU is the service consuming, is memory usage trending upward over time, is disk space running out?
+
+Prometheus scrapes metrics from Node Exporter every 15 seconds and stores them for 15 days. Grafana queries Prometheus and renders the data into dashboards. The two tools are decoupled — Prometheus collects regardless of whether Grafana is running, and Grafana can query multiple datasources beyond Prometheus.
+
+This mirrors the observability stack used in most production cloud environments.
