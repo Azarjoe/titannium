@@ -89,3 +89,15 @@ services:
     volumes:
       - ./uptime-kuma:/app/data
     restart: unless-stopped
+
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_SCHEDULE=0 0 3 * * *
+      - TZ=Europe/Paris
+      - DOCKER_API_VERSION=1.40
+    restart: unless-stopped

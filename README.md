@@ -65,6 +65,12 @@ All services are orchestrated via Docker Compose and exposed through Nginx Proxy
 | Mealie           | Recipe manager and meal planner   | https://recettes.titannium.fr    |
 | NAS (WIP)        | Future self-hosted storage        | https://nas.titannium.fr         |
 
+### Automation
+
+| Service     | Role                                              | Access        |
+|-------------|---------------------------------------------------|---------------|
+| Watchtower  | Automatic Docker image updates (daily at 3:00 AM) | Internal only |
+
 ---
 
 ## Project Structure
@@ -138,8 +144,9 @@ The pipeline is defined in `.github/workflows/validate.yml`.
 ## Roadmap
 
 - [ ] NAS setup (pending hardware)
-- [ ] Nextcloud deployment
+- [ ] Nextcloud deployment (same)
 - [x] Grafana + Prometheus observability stack
+- [x] Watchtower automatic updates
 - [ ] Automated backups (Restic)
 - [ ] CD pipeline — automatic deployment on push
 
@@ -198,3 +205,13 @@ Grafana + Prometheus answer a different set of questions: how much CPU is the se
 Prometheus scrapes metrics from Node Exporter every 15 seconds and stores them for 15 days. Grafana queries Prometheus and renders the data into dashboards. The two tools are decoupled — Prometheus collects regardless of whether Grafana is running, and Grafana can query multiple datasources beyond Prometheus.
 
 This mirrors the observability stack used in most production cloud environments.
+
+---
+
+### Why Watchtower?
+
+Keeping Docker images up to date manually means regularly checking each service for new releases, pulling new images, and recreating containers. This is error-prone and easy to forget.
+
+Watchtower automates this entirely — it runs every night at 3:00 AM, checks all running containers for new image versions, updates them in place, and removes the old images automatically. Zero manual intervention required.
+
+This ensures security patches and bug fixes are applied consistently without operational overhead.
