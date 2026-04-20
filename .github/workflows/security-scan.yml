@@ -1,0 +1,30 @@
+name: Security Scan
+
+on:
+  workflow_dispatch:
+
+jobs:
+  scan-ports:
+    name: Scan exposed ports
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install nmap
+        run: sudo apt-get install -y nmap
+
+      - name: Scan public ports
+        run: |
+          echo "Scanning 78.197.0.194..."
+          OPEN_PORTS=$(nmap -p 1-65535 --open 78.197.0.194 | grep "open" | awk '{print $1}' | cut -d'/' -f1 | tr '\n' ' ')
+          echo "Open ports detected: $OPEN_PORTS"
+
+      - name: Check for unexpected ports
+        run: |
+          ALLOWED_PORTS="80 443"
+          OPEN_PORTS=$(nmap -p 1-65535 --open 78.197.0.194 | grep "open" | awk '{print $1}' | cut -d'/' -f1 | tr '\n' ' ')
+          for PORT in $OPEN_PORTS; do
+            if ! echo "$ALLOWED_PORTS" | grep -qw "$PORT"; then
+              echo "UNEXPECTED PORT OPEN: $PORT"
+              exit 1
+            fi
+          done
+          echo "All good - only expected ports are open"
