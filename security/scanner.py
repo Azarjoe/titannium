@@ -4,7 +4,6 @@ from threading import Lock
 import sys
 
 ALLOWED_PORTS = [80, 443]
-EPHEMERAL_RANGE = range(32768, 61000)
 
 def scan_port(host, port, lock, open_ports):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -19,7 +18,7 @@ def scan_all_ports(host):
     open_ports = []
     lock = Lock()
     with concurrent.futures.ThreadPoolExecutor(max_workers=5000) as executor:
-        futures = [executor.submit(scan_port, host, port, lock, open_ports) for port in range(1, 65536)]
+        futures = [executor.submit(scan_port, host, port, lock, open_ports) for port in range(1, 32768)]
         concurrent.futures.wait(futures)
     open_ports.sort()
     return open_ports
@@ -36,8 +35,7 @@ def main():
 
     print(f"\nOpen ports: {open_ports}")
 
-    unexpected = [p for p in open_ports if p not in ALLOWED_PORTS and p not in EPHEMERAL_RANGE]
-
+    unexpected = [p for p in open_ports if p not in ALLOWED_PORTS]
 
     if unexpected:
         print(f"\nUNEXPECTED PORTS DETECTED: {unexpected}")
