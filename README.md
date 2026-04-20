@@ -81,7 +81,10 @@ All services are orchestrated via Docker Compose and exposed through Nginx Proxy
 ├── deploy.sh                   # Deployment script for multi-domain support
 ├── .github/
 │   └── workflows/
-│       └── validate.yml        # CI/CD pipeline (GitHub Actions)
+│       ├── validate.yml        # CI pipeline — runs on every push
+│       └── security-scan.yml   # Manual security port scan
+├── security/
+│   └── scanner.py              # Custom Python port scanner (asyncio + multithreading)
 ├── crowdsec/
 │   ├── docker-compose.yml
 │   └── config/
@@ -130,9 +133,7 @@ The script will prompt for a domain name and automatically replace all reference
 
 ## CI/CD
 
-Every push to `main` triggers a GitHub Actions pipeline that automatically validates the infrastructure.
-
-### Pipeline jobs
+### Validation pipeline — runs on every push to `main`
 
 **Validate Docker Compose files**
 Runs `docker compose config` on the root `docker-compose.yaml` and all service-level compose files to catch syntax errors before they reach the server.
@@ -143,7 +144,11 @@ Runs [Gitleaks](https://github.com/gitleaks/gitleaks) across the entire reposito
 **Lint Dockerfiles**
 Runs [Hadolint](https://github.com/hadolint/hadolint) on any Dockerfile present in the repository to enforce best practices.
 
-The pipeline is defined in `.github/workflows/validate.yml`.
+### Security scan — triggered manually
+
+A custom Python port scanner built with `concurrent.futures` and `socket` scans all 65535 ports of the public IP. The pipeline fails if any port other than 80 and 443 is detected as open — ensuring no service is accidentally exposed to the internet.
+
+The server IP is stored as a GitHub Actions secret and never hardcoded in the repository.
 
 ---
 
@@ -155,6 +160,7 @@ The pipeline is defined in `.github/workflows/validate.yml`.
 - An iptables bouncer applies CrowdSec decisions at system level
 - Remote access is handled via Tailscale — no VPN port exposed publicly
 - Sensitive services are protected by NPM access lists
+- Public exposure is verified regularly via an automated port scan triggered from GitHub Actions
 
 ---
 
@@ -165,6 +171,7 @@ The pipeline is defined in `.github/workflows/validate.yml`.
 - [x] Grafana + Prometheus observability stack
 - [x] Watchtower automatic updates
 - [x] Multi-domain deployment script
+- [x] Automated security port scan (GitHub Actions)
 - [ ] Automated backups (Restic)
 - [ ] CD pipeline — automatic deployment on push
 
@@ -241,3 +248,11 @@ This ensures security patches and bug fixes are applied consistently without ope
 Docker Compose supports `.env` files for variable substitution, but this only works for `docker-compose.yaml` files. Configuration files for Homepage, Mealie and other services are plain YAML files that do not support environment variable interpolation natively.
 
 A `deploy.sh` script using `sed` covers all file types uniformly — a single command replaces the domain across every configuration file regardless of format. This makes the infrastructure fully portable without adding complexity or tooling dependencies.
+
+---
+
+### Why a custom port scanner over nmap?
+
+nmap is the industry standard for port scanning, but it requires installation and adds a dependency to the CI pipeline.
+
+The custom scanner built with Python's `socket` and `concurrent.futures` modules has zero external dependencies — Python is already available on every GitHub Actions runner. Every line of code is visible in the repository, fully auditable, and easy to extend. It scans all 65535 ports in parallel using multithreading, making it fast enough for automated use in CI.
