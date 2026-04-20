@@ -17,8 +17,8 @@ def scan_port(host, port, lock, open_ports):
 def scan_all_ports(host):
     open_ports = []
     lock = Lock()
-    with concurrent.futures.ThreadPoolExecutor(max_workers=5000) as executor:
-        futures = [executor.submit(scan_port, host, port, lock, open_ports) for port in range(1, 32768)]
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1024) as executor:
+        futures = [executor.submit(scan_port, host, port, lock, open_ports) for port in range(1, 1025)]
         concurrent.futures.wait(futures)
     open_ports.sort()
     return open_ports
