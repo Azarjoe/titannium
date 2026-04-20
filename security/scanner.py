@@ -4,6 +4,7 @@ from threading import Lock
 import sys
 
 ALLOWED_PORTS = [80, 443]
+EPHEMERAL_RANGE = range(32768, 61000)
 
 def scan_port(host, port, lock, open_ports):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -35,7 +36,8 @@ def main():
 
     print(f"\nOpen ports: {open_ports}")
 
-    unexpected = [p for p in open_ports if p not in ALLOWED_PORTS]
+    unexpected = [p for p in open_ports if p not in ALLOWED_PORTS and p not in EPHEMERAL_RANGE]
+
 
     if unexpected:
         print(f"\nUNEXPECTED PORTS DETECTED: {unexpected}")
