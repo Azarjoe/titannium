@@ -52,5 +52,5 @@
         icon: https://raw.githubusercontent.com/louislam/uptime-kuma/master/public/icon.svg
 
     - Grafana:
-        href: https://grafana.titannium.fr
+        href: https://grafana.titannium.fr/d/rYdddlPWk/node-exporter-full
         icon: grafana
