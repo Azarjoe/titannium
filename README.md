@@ -78,6 +78,7 @@ All services are orchestrated via Docker Compose and exposed through Nginx Proxy
 ```bash
 /srv/docker/
 ├── docker-compose.yaml         # Global orchestration file
+├── deploy.sh                   # Deployment script for multi-domain support
 ├── .github/
 │   └── workflows/
 │       └── validate.yml        # CI/CD pipeline (GitHub Actions)
@@ -108,6 +109,22 @@ All services are orchestrated via Docker Compose and exposed through Nginx Proxy
 └── maintenance/
     └── index.html              # Placeholder page for services in construction
 ```
+
+---
+
+## Deployment
+
+To deploy this infrastructure on a new machine with a different domain:
+
+```bash
+git clone https://github.com/Azarjoe/titannium.git
+cd titannium
+./deploy.sh
+```
+
+The script will prompt for a domain name and automatically replace all references throughout the configuration files before starting the services.
+
+> Note: After running the script, configure your DNS records and set up proxy hosts in Nginx Proxy Manager manually.
 
 ---
 
@@ -144,9 +161,10 @@ The pipeline is defined in `.github/workflows/validate.yml`.
 ## Roadmap
 
 - [ ] NAS setup (pending hardware)
-- [ ] Nextcloud deployment (same)
+- [ ] Nextcloud deployment (pending hardware)
 - [x] Grafana + Prometheus observability stack
 - [x] Watchtower automatic updates
+- [x] Multi-domain deployment script
 - [ ] Automated backups (Restic)
 - [ ] CD pipeline — automatic deployment on push
 
@@ -215,3 +233,11 @@ Keeping Docker images up to date manually means regularly checking each service 
 Watchtower automates this entirely — it runs every night at 3:00 AM, checks all running containers for new image versions, updates them in place, and removes the old images automatically. Zero manual intervention required.
 
 This ensures security patches and bug fixes are applied consistently without operational overhead.
+
+---
+
+### Why a deployment script over environment variables?
+
+Docker Compose supports `.env` files for variable substitution, but this only works for `docker-compose.yaml` files. Configuration files for Homepage, Mealie and other services are plain YAML files that do not support environment variable interpolation natively.
+
+A `deploy.sh` script using `sed` covers all file types uniformly — a single command replaces the domain across every configuration file regardless of format. This makes the infrastructure fully portable without adding complexity or tooling dependencies.
