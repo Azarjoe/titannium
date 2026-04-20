@@ -15,6 +15,9 @@
         href: https://ytconvert.titannium.fr
         icon: https://media.sys.truenas.net/apps/metube/icons/icon.svg
 
+    - Vaultwarden:
+        href: https://vault.titannium.fr
+        icon: vaultwarden
 
 - Streaming:
     - Disney+:

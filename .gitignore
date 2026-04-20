@@ -26,3 +26,6 @@ npm/data/
 
 crowdsec/config/*
 !crowdsec/config/acquis.yaml
+
+
+vaultwarden/.env
