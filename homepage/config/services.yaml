@@ -36,6 +36,9 @@
         href: https://ikromi.com
         icon: https://www.google.com/s2/favicons?sz=128&domain=ikromi.com
 
+    - FRAnime:
+        href: https://franime.fr/
+        icon: https://franime.fr/logos/apple-touch-icon.png
 
 - Infrastructure & Monitoring:
     - Nginx Proxy Manager:
