@@ -60,3 +60,7 @@
     - Grafana:
         href: https://grafana.titannium.fr/d/rYdddlPWk/node-exporter-full
         icon: grafana
+
+    - Logs (Loki):
+        href: https://grafana.titannium.fr/d/47d31d83-5e25-486c-80e8-37c179eb41f4/titannium-logs
+        icon: loki
