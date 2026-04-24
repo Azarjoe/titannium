@@ -1,12 +1,12 @@
 # Titannium — Self-Hosted Infrastructure
 
-Personal self-hosted infrastructure built on Docker, exposed securely to the internet, monitored and version-controlled.
+Production-inspired self-hosted platform built on Docker, exposed securely to the internet, monitored and version-controlled.
 
 ---
 
 ## Overview
 
-**Titannium** is a production-grade self-hosted platform designed to:
+**Titannium** is an ops-grade self-hosted platform designed to:
 
 - Centralize useful services for personal and family use
 - Replace third-party SaaS tools with self-hosted, privacy-respecting alternatives
@@ -17,60 +17,55 @@ Personal self-hosted infrastructure built on Docker, exposed securely to the int
 
 ## System
 
-| Property     | Value             |
-|--------------|-------------------|
-| Hostname     | `nas`             |
-| OS           | Ubuntu 24.04 LTS  |
-| Architecture | x86_64            |
-| Storage      | 232GB (LVM)       |
-| Access       | SSH + Tailscale   |
+| Property     | Value            |
+|--------------|------------------|
+| Hostname     | `nas`            |
+| OS           | Ubuntu 24.04 LTS |
+| Architecture | x86_64           |
+| Storage      | 232GB (LVM)      |
+| Access       | SSH + Tailscale  |
 
 ---
 
 ## Stack
 
-All services are orchestrated via Docker Compose and exposed through Nginx Proxy Manager with automatic SSL (Let's Encrypt).
+All services run via Docker Compose, exposed through Nginx Proxy Manager with automatic SSL (Let's Encrypt).
 
 ### Core Infrastructure
 
-| Service              | Role                              | URL                              |
-|----------------------|-----------------------------------|----------------------------------|
-| Nginx Proxy Manager  | Reverse proxy, SSL termination    | https://npm.titannium.fr         |
-| Homepage             | Centralized dashboard             | https://home.titannium.fr        |
-| Portainer            | Docker management interface       | https://portainer.titannium.fr   |
+| Service             | Role                           | URL                            |
+|---------------------|--------------------------------|--------------------------------|
+| Nginx Proxy Manager | Reverse proxy, SSL termination | https://npm.titannium.fr       |
+| Homepage            | Centralized dashboard          | https://home.titannium.fr      |
+| Portainer           | Docker management interface    | https://portainer.titannium.fr |
 
 ### Security
 
-| Service       | Role                                          | Access                       |
-|---------------|-----------------------------------------------|------------------------------|
-| CrowdSec      | IDS/IPS — log analysis, IP banning via CAPI   | https://app.crowdsec.net     |
-| Tailscale     | Zero-trust private network for remote access  | Internal only                |
-| NPM           | Access lists, HTTPS enforcement on all routes | https://npm.titannium.fr     |
-| Vaultwarden   | Self-hosted password manager (Bitwarden)      | https://vault.titannium.fr   |
+| Service     | Role                                        | Access                     |
+|-------------|---------------------------------------------|----------------------------|
+| CrowdSec    | IDS/IPS — log analysis, IP banning via CAPI | https://app.crowdsec.net   |
+| Tailscale   | Zero-trust private network for SSH access   | Internal only              |
+| Vaultwarden | Self-hosted password manager (Bitwarden)    | https://vault.titannium.fr |
 
 ### Monitoring & Observability
 
-| Service        | Role                                               | URL                          |
-|----------------|----------------------------------------------------|------------------------------|
-| Uptime Kuma    | Service availability monitoring, alerting via SMTP | https://kuma.titannium.fr    |
-| Grafana        | Metrics visualization and dashboards               | https://grafana.titannium.fr |
-| Prometheus     | Metrics collection and storage (15 days retention) | Internal only                |
-| Node Exporter  | System metrics exposure (CPU, RAM, disk, network)  | Internal only                |
+| Service       | Role                                               | URL                          |
+|---------------|----------------------------------------------------|------------------------------|
+| Uptime Kuma   | Service availability monitoring, alerting via SMTP | https://kuma.titannium.fr    |
+| Grafana       | Metrics and logs visualization                     | https://grafana.titannium.fr |
+| Prometheus    | Metrics collection (15 days retention)             | Internal only                |
+| Node Exporter | System metrics (CPU, RAM, disk, network)           | Internal only                |
+| Loki          | Log aggregation and storage                        | Internal only (port 3100)    |
+| Promtail      | Log collector — Docker, NPM and system logs        | Internal only                |
 
 ### Tools & Services
 
-| Service          | Role                              | URL                              |
-|------------------|-----------------------------------|----------------------------------|
-| Password Pusher  | Secure one-time secret sharing    | https://secret.titannium.fr      |
-| MeTube           | YouTube to MP3/MP4 downloader     | https://ytconvert.titannium.fr   |
-| Mealie           | Recipe manager and meal planner   | https://recettes.titannium.fr    |
-| NAS (WIP)        | Future self-hosted storage        | https://nas.titannium.fr         |
-
-### Automation
-
-| Service     | Role                                              | Access        |
-|-------------|---------------------------------------------------|---------------|
-| Watchtower  | Automatic Docker image updates (daily at 3:00 AM) | Internal only |
+| Service         | Role                            | URL                            |
+|-----------------|---------------------------------|--------------------------------|
+| Password Pusher | Secure one-time secret sharing  | https://secret.titannium.fr    |
+| MeTube          | YouTube to MP3/MP4 downloader   | https://ytconvert.titannium.fr |
+| Mealie          | Recipe manager and meal planner | https://recettes.titannium.fr  |
+| Watchtower      | Automatic image updates (3 AM)  | Internal only                  |
 
 ---
 
@@ -78,144 +73,95 @@ All services are orchestrated via Docker Compose and exposed through Nginx Proxy
 
 ```bash
 /srv/docker/
-├── docker-compose.yaml         # Global orchestration file
-├── deploy.sh                   # Deployment script for multi-domain support
-├── .github/
-│   └── workflows/
-│       ├── validate.yml        # CI pipeline — runs on every push
-│       └── security-scan.yml   # Manual security port scan
+├── docker-compose.yaml         # Global orchestration
+├── deploy.sh                   # Multi-domain deployment script (sed-based)
+├── .github/workflows/
+│   ├── validate.yml            # CI: compose validation, gitleaks, hadolint
+│   └── security-scan.yml       # Manual port scan (1-1024) via GitHub Actions
 ├── security/
-│   └── scanner.py              # Custom Python port scanner (concurrent.futures + socket)
+│   └── scanner.py              # Custom Python port scanner
 ├── crowdsec/
-│   ├── docker-compose.yml
-│   └── config/
-│       └── acquis.yaml         # Log sources config (SSH, Docker, NPM)
-├── homepage/
-│   └── config/
-│       ├── services.yaml       # Services displayed on dashboard
-│       ├── widgets.yaml        # Widgets (CPU, RAM, weather)
-│       └── bookmarks.yaml      # External shortcuts
+│   ├── docker-compose.yml      # Exposes API on 127.0.0.1:8090 for host bouncer
+│   └── config/acquis.yaml      # Log sources (SSH, Docker, NPM)
+├── homepage/config/            # services.yaml, widgets.yaml, bookmarks.yaml
 ├── monitoring/
-│   ├── docker-compose.yml      # Grafana, Prometheus, Node Exporter
-│   └── prometheus.yml          # Scrape config
-├── vaultwarden/
-│   └── docker-compose.yml      # Vaultwarden password manager
-├── npm/
-│   └── data/
-│       ├── nginx/              # Proxy host configs
-│       └── logs/               # Access and error logs (used by CrowdSec)
-├── portainer/
-│   └── data/                   # Portainer database and certs
-├── mealie/
-│   └── data/                   # Recipes, DB, backups
-├── metube/
-│   └── downloads/              # Downloaded media files
-├── pwpush/                     # Password Pusher database
-├── uptime-kuma/                # Kuma database and screenshots
-└── maintenance/
-    └── index.html              # Placeholder page for services in construction
+│   ├── docker-compose.yml      # Grafana, Prometheus, Node Exporter, Loki, Promtail
+│   ├── prometheus.yml
+│   ├── loki-config.yml
+│   └── promtail-config.yml     # 3 scrape jobs: docker, varlogs, npm
+├── vaultwarden/docker-compose.yml
+└── npm/data/logs/              # NPM access logs (shared with CrowdSec + Promtail)
 ```
-
----
-
-## Deployment
-
-To deploy this infrastructure on a new machine with a different domain:
-
-```bash
-git clone https://github.com/Azarjoe/titannium.git
-cd titannium
-./deploy.sh
-```
-
-The script prompts for a domain name and automatically replaces all references throughout the configuration files before starting the services.
-
-> Note: After running the script, configure DNS records, set up proxy hosts in Nginx Proxy Manager, and provide secrets manually.
 
 ---
 
 ## CI/CD
 
-### Validation pipeline — runs on every push to `main`
-
-- `docker compose config` validates all compose files for syntax errors
-- [Gitleaks](https://github.com/gitleaks/gitleaks) scans the repository for accidentally committed secrets
-- [Hadolint](https://github.com/hadolint/hadolint) lints any Dockerfile present
+### Validation — runs on every push to `main`
+- `docker compose config` — validates all compose files
+- [Gitleaks](https://github.com/gitleaks/gitleaks) — scans for accidentally committed secrets
+- [Hadolint](https://github.com/hadolint/hadolint) — lints Dockerfiles
 
 ### Security scan — triggered manually
-
-A custom Python port scanner scans all well-known ports (1-1024) of the public IP and fails if any port other than 80 and 443 is open. The scan is limited to 1-1024 to avoid false positives from ephemeral ports generated by GitHub Actions runners. The server IP is stored as a GitHub Actions secret.
+Custom Python port scanner targeting ports 1-1024 on the public IP. Fails if any port other than 80 and 443 is open. Server IP stored as a GitHub Actions secret.
 
 ---
 
-## Security model
+## Security Model
 
 - All services exposed exclusively via HTTPS (Let's Encrypt via NPM)
 - No port directly exposed to the internet — all traffic goes through the reverse proxy
 - CrowdSec ingests SSH, Docker and NPM logs, shares threat intelligence via CAPI
-- An iptables bouncer applies CrowdSec decisions at system level
-- Remote access via Tailscale — no VPN port exposed publicly
-- Sensitive services protected by NPM access lists
-- Vaultwarden self-hosted with SMTP invitations, public signups disabled
-- Public exposure verified via automated port scan from GitHub Actions
+- iptables bouncer (host systemd service) applies CrowdSec decisions in real time, connecting to the CrowdSec API on `127.0.0.1:8090`
+- Remote access via Tailscale — SSH port never visible from the internet
+- Vaultwarden with public signups disabled, SMTP invitations only
+- Secrets excluded via `.gitignore`, scanned on every push with Gitleaks
+
+> **CrowdSec note:** The agent runs as a Docker container and exposes its API on `127.0.0.1:8090` (internal port 8080 remapped to avoid conflict with NPM). The host bouncer connects to this port to apply iptables DROP rules.
+
+---
+
+## Observability Stack
+
+- **Prometheus** scrapes Node Exporter every 15s for system metrics
+- **Promtail** ships logs to Loki via 3 scrape jobs: Docker container logs, NPM access logs, and system logs (`/var/log/`)
+- **Loki** stores and indexes logs by label — no full-text indexing
+- **Grafana** provides a unified interface for both metrics (Prometheus) and logs (Loki), including a custom **Titannium - Logs** dashboard with real-time panels for Docker, NPM and system logs
 
 ---
 
 ## Roadmap
 
-- [ ] NAS setup (pending hardware)
-- [ ] Nextcloud deployment (pending hardware)
 - [x] Grafana + Prometheus observability stack
+- [x] Loki + Promtail log aggregation + custom dashboard
 - [x] Watchtower automatic updates
 - [x] Multi-domain deployment script
 - [x] Automated security port scan (GitHub Actions)
 - [x] Vaultwarden self-hosted password manager
-- [ ] Automated backups (Restic)
+- [x] CrowdSec firewall bouncer operational
+- [ ] NAS setup (pending hardware)
+- [ ] Nextcloud (pending hardware)
+- [ ] Automated backups with Restic
 - [ ] CD pipeline — automatic deployment on push
 
 ---
 
-## Technical decisions
+## Technical Decisions
 
-### Why Docker?
-Isolation, portability, reproducibility, and simplified updates. Each service runs in its own container — a crash or misconfiguration in one does not affect the others. The entire infrastructure is described in compose files and can be rebuilt on a new machine in minutes.
+**Docker** — Isolation, portability, and reproducibility. Each service is contained — a crash in one doesn't affect the others. The full infrastructure can be rebuilt from compose files in minutes.
 
----
+**Tailscale over exposed SSH** — Exposing SSH publicly means constant brute force attempts. Tailscale creates a WireGuard tunnel — the port is never visible from the internet.
 
-### Why Tailscale over exposing SSH directly?
-Exposing SSH publicly means constant brute force attempts. Tailscale creates an encrypted WireGuard tunnel — the SSH port is never visible from the internet. A closed port cannot be attacked.
+**CrowdSec over Fail2ban** — Fail2ban is reactive and local. CrowdSec adds community threat intelligence: malicious IPs reported globally are blocked before they reach your server. Its decoupled agent + bouncer architecture mirrors production security patterns.
 
----
+**Nginx Proxy Manager over raw Nginx** — NPM handles SSL generation, renewal and proxy config through a UI. In a larger context, direct Nginx or Traefik config would give finer control — NPM is the right tradeoff at this scale.
 
-### Why CrowdSec over Fail2ban?
-Fail2ban is reactive and local. CrowdSec adds community threat intelligence — malicious IPs reported by thousands of servers worldwide are blocked before they ever reach yours. Its decoupled architecture (agent + bouncer) mirrors patterns used in production security infrastructure.
+**Grafana + Prometheus over Uptime Kuma alone** — Kuma answers: *is it up?* Prometheus answers: *how much CPU, is memory trending up, is disk running out?* Both layers are necessary for real observability.
 
----
+**Loki + Promtail** — Logs are the missing layer between uptime and metrics. Loki indexes only labels (not full text), making it lightweight. Grafana queries it via LogQL, giving a single pane of glass for metrics and logs.
 
-### Why Nginx Proxy Manager over raw Nginx?
-NPM handles SSL generation, renewal and proxy configuration through a UI, reducing operational overhead significantly. In an enterprise context, direct Nginx or Traefik configuration would give finer control — NPM is the right tool for this scale.
+**Vaultwarden over a cloud password manager** — Credentials stay local, encrypted, and under your control. Compatible with all official Bitwarden clients with zero vendor dependency.
 
----
+**Deployment script over env vars** — Docker Compose `.env` substitution only covers compose files. A `sed`-based script handles all file types (YAML, HTML, configs) with zero added dependencies.
 
-### Why Grafana + Prometheus over Uptime Kuma alone?
-Uptime Kuma answers: is the service up? Grafana + Prometheus answer: how much CPU, is memory trending up, is disk running out? The two tools are decoupled and mirror the observability stack used in most production cloud environments.
-
----
-
-### Why Vaultwarden over a cloud password manager?
-Cloud password managers store credentials on third-party servers. Vaultwarden is a self-hosted Bitwarden-compatible server — credentials are encrypted and stored locally. Compatible with all official Bitwarden clients (mobile, desktop, browser extension) with zero vendor dependency.
-
----
-
-### Why Watchtower?
-Manual image updates are error-prone and easy to forget. Watchtower runs every night at 3:00 AM, pulls new image versions, recreates containers, and removes old images automatically — zero manual intervention.
-
----
-
-### Why a deployment script over environment variables?
-Docker Compose `.env` substitution only works for compose files. Homepage, Mealie and other services use plain YAML that does not support interpolation. A `sed`-based script covers all file types uniformly with zero added dependencies.
-
----
-
-### Why a custom port scanner over nmap?
-Zero external dependencies — Python is already available on every GitHub Actions runner. The scanner uses `concurrent.futures` and `socket` for parallel scanning. Scoped to ports 1-1024 to avoid false positives from ephemeral ports on shared runners. A full scan would require a self-hosted runner with a static IP.
+**Custom port scanner over nmap** — Zero external dependencies on GitHub Actions runners. Uses `concurrent.futures` + `socket` for parallel scanning, scoped to ports 1-1024 to avoid false positives from ephemeral ports on shared runners.
