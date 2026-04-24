@@ -3,6 +3,8 @@ services:
     image: crowdsecurity/crowdsec:latest
     container_name: crowdsec
     restart: unless-stopped
+    ports:
+      - "127.0.0.1:8090:8080"
     volumes:
       - ./config:/etc/crowdsec
       - ./data:/var/lib/crowdsec/data
@@ -13,7 +15,6 @@ services:
       - COLLECTIONS=crowdsecurity/nginx crowdsecurity/sshd
     networks:
       - npm_default
-
 networks:
   npm_default:
     external: true
