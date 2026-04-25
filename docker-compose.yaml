@@ -102,5 +102,3 @@ services:
       - DOCKER_API_VERSION=1.40
     restart: unless-stopped
 
-  invalid_service:
-    image:
