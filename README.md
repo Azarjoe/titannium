@@ -49,14 +49,14 @@ All services run via Docker Compose, exposed through Nginx Proxy Manager with au
 
 ### Monitoring & Observability
 
-| Service       | Role                                               | URL                          |
-|---------------|----------------------------------------------------|------------------------------|
-| Uptime Kuma   | Service availability monitoring, alerting via SMTP | https://kuma.titannium.fr    |
-| Grafana       | Metrics and logs visualization                     | https://grafana.titannium.fr |
-| Prometheus    | Metrics collection (15 days retention)             | Internal only                |
-| Node Exporter | System metrics (CPU, RAM, disk, network)           | Internal only                |
-| Loki          | Log aggregation and storage                        | Internal only (port 3100)    |
-| Promtail      | Log collector — Docker, NPM and system logs        | Internal only                |
+| Service       | Role                                                              | URL                          |
+|---------------|-------------------------------------------------------------------|------------------------------|
+| Uptime Kuma   | Service availability monitoring, alerting via SMTP                | https://kuma.titannium.fr    |
+| Grafana       | Metrics and logs visualization, alerting (CPU > 80%, Disk > 90%) | https://grafana.titannium.fr |
+| Prometheus    | Metrics collection (15 days retention)                            | Internal only                |
+| Node Exporter | System metrics (CPU, RAM, disk, network)                          | Internal only                |
+| Loki          | Log aggregation and storage                                       | Internal only (port 3100)    |
+| Promtail      | Log collector — Docker, NPM and system logs                       | Internal only                |
 
 ### Tools & Services
 
@@ -65,7 +65,12 @@ All services run via Docker Compose, exposed through Nginx Proxy Manager with au
 | Password Pusher | Secure one-time secret sharing  | https://secret.titannium.fr    |
 | MeTube          | YouTube to MP3/MP4 downloader   | https://ytconvert.titannium.fr |
 | Mealie          | Recipe manager and meal planner | https://recettes.titannium.fr  |
-| Watchtower      | Automatic image updates (3 AM)  | Internal only                  |
+
+### Automation
+
+| Service    | Role                                                           | Access        |
+|------------|----------------------------------------------------------------|---------------|
+| Watchtower | Automatic Docker image updates (3 AM) with Discord notifications | Internal only |
 
 ---
 
@@ -76,7 +81,7 @@ All services run via Docker Compose, exposed through Nginx Proxy Manager with au
 ├── docker-compose.yaml         # Global orchestration
 ├── deploy.sh                   # Multi-domain deployment script (sed-based)
 ├── .github/workflows/
-│   ├── validate.yml            # CI: compose validation, gitleaks, hadolint
+│   ├── validate.yml            # CI: compose validation, gitleaks, hadolint, Discord alert on failure
 │   └── security-scan.yml       # Manual port scan (1-1024) via GitHub Actions
 ├── security/
 │   └── scanner.py              # Custom Python port scanner
@@ -105,6 +110,9 @@ All services run via Docker Compose, exposed through Nginx Proxy Manager with au
 ### Security scan — triggered manually
 Custom Python port scanner targeting ports 1-1024 on the public IP. Fails if any port other than 80 and 443 is open. Server IP stored as a GitHub Actions secret.
 
+### Notifications — Discord alert on failure
+A dedicated job runs after all CI jobs and sends a Discord notification if any job fails, including a direct link to the failed run.
+
 ---
 
 ## Security Model
@@ -127,6 +135,7 @@ Custom Python port scanner targeting ports 1-1024 on the public IP. Fails if any
 - **Promtail** ships logs to Loki via 3 scrape jobs: Docker container logs, NPM access logs, and system logs (`/var/log/`)
 - **Loki** stores and indexes logs by label — no full-text indexing
 - **Grafana** provides a unified interface for both metrics (Prometheus) and logs (Loki), including a custom **Titannium - Logs** dashboard with real-time panels for Docker, NPM and system logs
+- **Grafana alerting** monitors CPU usage and disk space, sending email notifications when thresholds are exceeded (CPU > 80%, Disk > 90%)
 
 ---
 
@@ -134,9 +143,11 @@ Custom Python port scanner targeting ports 1-1024 on the public IP. Fails if any
 
 - [x] Grafana + Prometheus observability stack
 - [x] Loki + Promtail log aggregation + custom dashboard
-- [x] Watchtower automatic updates
+- [x] Grafana alerting (CPU > 80%, Disk > 90%)
+- [x] Watchtower automatic updates with Discord notifications
 - [x] Multi-domain deployment script
 - [x] Automated security port scan (GitHub Actions)
+- [x] Discord notifications on CI failure
 - [x] Vaultwarden self-hosted password manager
 - [x] CrowdSec firewall bouncer operational
 - [ ] NAS setup (pending hardware)

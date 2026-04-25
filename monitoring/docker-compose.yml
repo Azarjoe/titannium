@@ -33,6 +33,12 @@ services:
       - grafana_data:/var/lib/grafana
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=changeme
+      - GF_SMTP_ENABLED=true
+      - GF_SMTP_HOST=smtp.gmail.com:587
+      - GF_SMTP_USER=sage.julien@gmail.com
+      - GF_SMTP_PASSWORD=zhyeltxczfaenkxv
+      - GF_SMTP_FROM_ADDRESS=sage.julien@gmail.com
+      - GF_SMTP_FROM_NAME=Grafana Titannium
     restart: unless-stopped
 
   loki:
