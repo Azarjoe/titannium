@@ -100,5 +100,6 @@ services:
       - WATCHTOWER_SCHEDULE=0 0 3 * * *
       - TZ=Europe/Paris
       - DOCKER_API_VERSION=1.40
+      - WATCHTOWER_NOTIFICATIONS=shoutrrr
+      - WATCHTOWER_NOTIFICATION_URL=discord://zJN00jF_IUcOWf4s5eZgLq9zu1O1mAaRShkoBZReCoGCl-wuBfMha8LXOUE95xWfizo5@1497640643722350693
     restart: unless-stopped
-
