@@ -68,8 +68,8 @@ All services run via Docker Compose, exposed through Nginx Proxy Manager with au
 
 ### Automation
 
-| Service    | Role                                                           | Access        |
-|------------|----------------------------------------------------------------|---------------|
+| Service    | Role                                                             | Access        |
+|------------|------------------------------------------------------------------|---------------|
 | Watchtower | Automatic Docker image updates (3 AM) with Discord notifications | Internal only |
 
 ---
@@ -80,6 +80,7 @@ All services run via Docker Compose, exposed through Nginx Proxy Manager with au
 /srv/docker/
 ├── docker-compose.yaml         # Global orchestration
 ├── deploy.sh                   # Multi-domain deployment script (sed-based)
+├── npm-headers.sh              # Applies HTTP security headers to NPM on startup
 ├── .github/workflows/
 │   ├── validate.yml            # CI: compose validation, gitleaks, hadolint, Discord alert on failure
 │   └── security-scan.yml       # Manual port scan (1-1024) via GitHub Actions
@@ -119,6 +120,7 @@ A dedicated job runs after all CI jobs and sends a Discord notification if any j
 
 - All services exposed exclusively via HTTPS (Let's Encrypt via NPM)
 - No port directly exposed to the internet — all traffic goes through the reverse proxy
+- HTTP security headers enforced on all responses: `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Strict-Transport-Security` — applied via a systemd service (`npm-headers.service`) that patches NPM's Nginx config on every startup
 - CrowdSec ingests SSH, Docker and NPM logs, shares threat intelligence via CAPI
 - iptables bouncer (host systemd service) applies CrowdSec decisions in real time, connecting to the CrowdSec API on `127.0.0.1:8090`
 - Remote access via Tailscale — SSH port never visible from the internet
@@ -126,6 +128,8 @@ A dedicated job runs after all CI jobs and sends a Discord notification if any j
 - Secrets excluded via `.gitignore`, scanned on every push with Gitleaks
 
 > **CrowdSec note:** The agent runs as a Docker container and exposes its API on `127.0.0.1:8090` (internal port 8080 remapped to avoid conflict with NPM). The host bouncer connects to this port to apply iptables DROP rules.
+
+> **HTTP headers note:** NPM Community Edition does not support custom headers via the UI. Headers are injected by patching Nginx's `proxy.conf` inside the container via `npm-headers.sh`, which runs as a systemd oneshot service on every boot.
 
 ---
 
@@ -150,6 +154,7 @@ A dedicated job runs after all CI jobs and sends a Discord notification if any j
 - [x] Discord notifications on CI failure
 - [x] Vaultwarden self-hosted password manager
 - [x] CrowdSec firewall bouncer operational
+- [x] HTTP security headers (HSTS, X-Frame-Options, CSP) via systemd service
 - [ ] NAS setup (pending hardware)
 - [ ] Nextcloud (pending hardware)
 - [ ] Automated backups with Restic
@@ -176,3 +181,5 @@ A dedicated job runs after all CI jobs and sends a Discord notification if any j
 **Deployment script over env vars** — Docker Compose `.env` substitution only covers compose files. A `sed`-based script handles all file types (YAML, HTML, configs) with zero added dependencies.
 
 **Custom port scanner over nmap** — Zero external dependencies on GitHub Actions runners. Uses `concurrent.futures` + `socket` for parallel scanning, scoped to ports 1-1024 to avoid false positives from ephemeral ports on shared runners.
+
+**HTTP security headers via systemd** — NPM Community Edition does not expose header configuration through its UI. Rather than migrating to a more complex reverse proxy, a lightweight systemd oneshot service patches NPM's internal Nginx config on every boot, adding security headers without altering the container image or compose setup.
