@@ -60,11 +60,13 @@ All services run via Docker Compose, exposed through Nginx Proxy Manager with au
 
 ### Tools & Services
 
-| Service         | Role                            | URL                            |
-|-----------------|---------------------------------|--------------------------------|
-| Password Pusher | Secure one-time secret sharing  | https://secret.titannium.fr    |
-| MeTube          | YouTube to MP3/MP4 downloader   | https://ytconvert.titannium.fr |
-| Mealie          | Recipe manager and meal planner | https://recettes.titannium.fr  |
+| Service          | Role                                        | URL                              |
+|------------------|---------------------------------------------|----------------------------------|
+| Password Pusher  | Secure one-time secret sharing              | https://secret.titannium.fr      |
+| MeTube           | YouTube to MP3/MP4 downloader               | https://ytconvert.titannium.fr   |
+| Mealie           | Recipe manager and meal planner             | https://recettes.titannium.fr    |
+| Speedtest Tracker| Internet speed history and monitoring       | https://speedtest.titannium.fr   |
+| Excalidraw       | Collaborative whiteboard and diagramming    | https://draw.titannium.fr        |
 
 ### Automation
 
@@ -96,6 +98,8 @@ All services run via Docker Compose, exposed through Nginx Proxy Manager with au
 │   ├── loki-config.yml
 │   └── promtail-config.yml     # 3 scrape jobs: docker, varlogs, npm
 ├── vaultwarden/docker-compose.yml
+├── speedtest-tracker/docker-compose.yml
+├── excalidraw/docker-compose.yml
 └── npm/data/logs/              # NPM access logs (shared with CrowdSec + Promtail)
 ```
 
@@ -155,6 +159,8 @@ A dedicated job runs after all CI jobs and sends a Discord notification if any j
 - [x] Vaultwarden self-hosted password manager
 - [x] CrowdSec firewall bouncer operational
 - [x] HTTP security headers (HSTS, X-Frame-Options, CSP) via systemd service
+- [x] Speedtest Tracker — internet speed history
+- [x] Excalidraw — collaborative whiteboard
 - [ ] NAS setup (pending hardware)
 - [ ] Nextcloud (pending hardware)
 - [ ] Automated backups with Restic
