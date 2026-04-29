@@ -19,6 +19,14 @@
         href: https://vault.titannium.fr
         icon: vaultwarden
 
+    - Speedtest Tracker:
+        href: https://speedtest.titannium.fr
+        icon: speedtest-tracker
+
+    - Excalidraw:
+        href: https://draw.titannium.fr
+        icon: excalidraw
+
 - Streaming:
     - Disney+:
         href: https://disneyplus.com
