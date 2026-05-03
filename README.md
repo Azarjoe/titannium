@@ -60,13 +60,15 @@ All services run via Docker Compose, exposed through Nginx Proxy Manager with au
 
 ### Tools & Services
 
-| Service          | Role                                        | URL                              |
-|------------------|---------------------------------------------|----------------------------------|
-| Password Pusher  | Secure one-time secret sharing              | https://secret.titannium.fr      |
-| MeTube           | YouTube to MP3/MP4 downloader               | https://ytconvert.titannium.fr   |
-| Mealie           | Recipe manager and meal planner             | https://recettes.titannium.fr    |
-| Speedtest Tracker| Internet speed history and monitoring       | https://speedtest.titannium.fr   |
-| Excalidraw       | Collaborative whiteboard and diagramming    | https://draw.titannium.fr        |
+| Service           | Role                                     | URL                              |
+|-------------------|------------------------------------------|----------------------------------|
+| Password Pusher   | Secure one-time secret sharing           | https://secret.titannium.fr      |
+| MeTube            | YouTube to MP3/MP4 downloader            | https://ytconvert.titannium.fr   |
+| Mealie            | Recipe manager and meal planner          | https://recettes.titannium.fr    |
+| Speedtest Tracker | Internet speed history and monitoring    | https://speedtest.titannium.fr   |
+| Excalidraw        | Collaborative whiteboard and diagramming | https://draw.titannium.fr        |
+| Snappymail        | Self-hosted webmail client               | https://mail.titannium.fr        |
+| Le Chroniqueur    | Family satire news site (WordPress)      | https://news.titannium.fr        |
 
 ### Automation
 
@@ -100,6 +102,8 @@ All services run via Docker Compose, exposed through Nginx Proxy Manager with au
 ├── vaultwarden/docker-compose.yml
 ├── speedtest-tracker/docker-compose.yml
 ├── excalidraw/docker-compose.yml
+├── snappymail/docker-compose.yml
+├── lechroniqueur/docker-compose.yml  # WordPress + MariaDB
 └── npm/data/logs/              # NPM access logs (shared with CrowdSec + Promtail)
 ```
 
@@ -161,6 +165,8 @@ A dedicated job runs after all CI jobs and sends a Discord notification if any j
 - [x] HTTP security headers (HSTS, X-Frame-Options, CSP) via systemd service
 - [x] Speedtest Tracker — internet speed history
 - [x] Excalidraw — collaborative whiteboard
+- [x] Snappymail — self-hosted webmail
+- [x] Le Chroniqueur — family satire news site (WordPress)
 - [ ] NAS setup (pending hardware)
 - [ ] Nextcloud (pending hardware)
 - [ ] Automated backups with Restic

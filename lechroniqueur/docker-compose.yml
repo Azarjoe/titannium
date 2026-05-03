@@ -1,0 +1,28 @@
+services:
+  wordpress:
+    image: wordpress:latest
+    container_name: lechroniqueur
+    ports:
+      - "8769:80"
+    environment:
+      - WORDPRESS_DB_HOST=db
+      - WORDPRESS_DB_USER=wp_user
+      - WORDPRESS_DB_PASSWORD=wp_password_secret
+      - WORDPRESS_DB_NAME=lechroniqueur
+    volumes:
+      - ./wp-content:/var/www/html/wp-content
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  db:
+    image: mariadb:latest
+    container_name: lechroniqueur-db
+    environment:
+      - MYSQL_DATABASE=lechroniqueur
+      - MYSQL_USER=wp_user
+      - MYSQL_PASSWORD=wp_password_secret
+      - MYSQL_ROOT_PASSWORD=root_password_secret
+    volumes:
+      - ./db:/var/lib/mysql
+    restart: unless-stopped

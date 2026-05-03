@@ -29,3 +29,5 @@ crowdsec/config/*
 
 
 vaultwarden/.env
+lechroniqueur/db/
+lechroniqueur/wp-content/uploads/
